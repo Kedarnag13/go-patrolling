@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"github.com/Kedarnag13/go-patrolling/api/v1/controllers"
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
@@ -36,6 +37,12 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 	find_by_mobile_number := db.Where("mobile_number = ?", user.MobileNumber).Find(&user)
 
 	if find_by_mobile_number.RecordNotFound() == true {
+
+		key := []byte("traveling is fun")
+		password := []byte(user.Password)
+		confirm_password := []byte(user.PasswordConfirmation)
+
+		var user = models.User{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email, MobileNumber: user.MobileNumber, Password: controllers.Encrypt(key, password), PasswordConfirmation: controllers.Encrypt(key, confirm_password)}
 		db.Create(&user)
 		b, err := json.Marshal(models.Message{
 			Success: true,
