@@ -26,3 +26,9 @@ type Device struct {
 	gorm.Model
 	Token string `json:"token"`
 }
+
+type Message struct {
+	Success bool
+	Message string
+	Error   string
+}

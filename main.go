@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	// Connect to Database
+	// To Connect with the Database
 	db, err := gorm.Open("postgres", "host=localhost user=postgres password=password dbname=go_patrolling_development sslmode=disable")
 	if err != nil {
 		panic(err)
