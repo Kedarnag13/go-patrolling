@@ -6,6 +6,7 @@ import (
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
+	// "log"
 	"net/http"
 )
 
@@ -23,6 +24,7 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 	defer db.Close()
 
 	var user models.User
+	// var session models.Session
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -45,6 +47,20 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		var user = models.User{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email, MobileNumber: user.MobileNumber, Password: controllers.Encrypt(key, password), PasswordConfirmation: controllers.Encrypt(key, confirm_password), DeviseToken: user.DeviseToken}
 
 		db.Create(&user)
+
+		get_user, err := db.Model(&user).Where("mobile_number = ?", user.MobileNumber).Select("id").Rows() // (*sql.Rows, error)
+		defer get_user.Close()
+
+		for get_user.Next() {
+			var id int
+			err = get_user.Scan(&id)
+			if err != nil {
+				panic(err)
+			}
+			var session = models.Session{UserID: id, DeviseToken: user.DeviseToken}
+
+			db.Create(&session)
+		}
 
 		b, err := json.Marshal(models.Message{
 			Success: true,

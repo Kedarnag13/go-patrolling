@@ -19,7 +19,7 @@ type User struct {
 type Session struct {
 	gorm.Model
 	User        User   `gorm:"ForeignKey:UserID"`
-	UserID      uint   `json:"user_id"`
+	UserID      int    `json:"user_id"`
 	Device      Device `gorm:"ForeignKey:DeviseToken"`
 	DeviseToken string `json:"devise_token"`
 }
