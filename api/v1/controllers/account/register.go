@@ -48,7 +48,8 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 
 		db.Create(&user)
 
-		get_user, err := db.Model(&user).Where("mobile_number = ?", user.MobileNumber).Select("id").Rows() // (*sql.Rows, error)
+		get_user, err := db.Model(&user).Where("mobile_number = ?", user.MobileNumber).Select("id").Rows()
+
 		defer get_user.Close()
 
 		for get_user.Next() {
@@ -57,14 +58,17 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 			if err != nil {
 				panic(err)
 			}
+
 			var session = models.Session{UserID: id, DeviseToken: user.DeviseToken}
 
 			db.Create(&session)
-		}
 
+			var device = models.Device{Token: user.DeviseToken}
+			db.Create(&device)
+		}
 		b, err := json.Marshal(models.Message{
 			Success: true,
-			Message: "User created Successfully!",
+			Message: "Session created Successfully!",
 			Error:   "",
 		})
 		if err != nil {
@@ -72,6 +76,7 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		}
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
+		goto end
 	} else {
 		b, err := json.Marshal(models.Message{
 			Success: false,
@@ -84,5 +89,5 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
 	}
-
+end:
 }
