@@ -12,6 +12,8 @@ type User struct {
 	MobileNumber         string `json:"mobile_number"`
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"password_confirmation"`
+	Device               Device `gorm:"ForeignKey:DeviseToken"`
+	DeviseToken          string `json:"devise_token"`
 }
 
 type Session struct {

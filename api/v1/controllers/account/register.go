@@ -42,8 +42,10 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		password := []byte(user.Password)
 		confirm_password := []byte(user.PasswordConfirmation)
 
-		var user = models.User{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email, MobileNumber: user.MobileNumber, Password: controllers.Encrypt(key, password), PasswordConfirmation: controllers.Encrypt(key, confirm_password)}
+		var user = models.User{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email, MobileNumber: user.MobileNumber, Password: controllers.Encrypt(key, password), PasswordConfirmation: controllers.Encrypt(key, confirm_password), DeviseToken: user.DeviseToken}
+
 		db.Create(&user)
+
 		b, err := json.Marshal(models.Message{
 			Success: true,
 			Message: "User created Successfully!",
@@ -52,7 +54,6 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		if err != nil {
 			panic(err)
 		}
-
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
 	} else {
@@ -64,7 +65,6 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		if err != nil {
 			panic(err)
 		}
-
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
 	}
