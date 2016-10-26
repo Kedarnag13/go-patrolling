@@ -5,7 +5,6 @@ import (
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -34,12 +33,33 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		panic(err)
 	}
 
-	find_by_mobile_number := db.Where("mobile_number = ?", user.MobileNumber).First(&user)
+	find_by_mobile_number := db.Where("mobile_number = ?", user.MobileNumber).Find(&user)
 
 	if find_by_mobile_number.RecordNotFound() == true {
 		db.Create(&user)
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "User created Successfully!",
+			Error:   "",
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
 	} else {
-		log.Println(find_by_mobile_number.GetErrors())
+		b, err := json.Marshal(models.Message{
+			Success: false,
+			Message: "",
+			Error:   "Mobile Number already exists!",
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
 	}
 
 }
