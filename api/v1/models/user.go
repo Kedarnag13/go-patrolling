@@ -2,6 +2,8 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
+	// "github.com/lib/pq/hstore"
+	// "time"
 )
 
 type User struct {
@@ -29,8 +31,20 @@ type Device struct {
 	Token string `json:"token"`
 }
 
+type Tracker struct {
+	gorm.Model
+	StartLocation string `json:"start_location"`
+	// StartTime     time.Time `json:"start_time"`
+	Routes []string `json:"route" sql:"type:jsonb"`
+	// Routes map[string]interface{} `json:"route" sql:"type:jsonb`
+	// EndTime       time.Time `json:"end_time"`
+	EndLocation string `json:"end_location"`
+	User        User   `gorm:"ForeignKey:UserID"`
+	UserID      int    `json:"user_id"`
+}
+
 type Message struct {
-	Success bool
-	Message string
-	Error   string
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Error   string `json:"error"`
 }
