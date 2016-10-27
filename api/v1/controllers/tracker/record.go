@@ -42,6 +42,7 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
 	track = models.Tracker{StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: id}
 
 	// var routes models.Tracker
@@ -55,6 +56,7 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 	// for _, route = range routes.Routes {
 	// 	track.Routes = append(track.Routes, route)
 	// }
+
 	db.Create(&track)
 
 	b, err := json.Marshal(models.Message{

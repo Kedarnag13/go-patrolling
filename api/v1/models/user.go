@@ -10,8 +10,8 @@ type User struct {
 	gorm.Model
 	FirstName            string `json:"first_name"`
 	LastName             string `json:"last_name"`
-	Email                string `json:"email"`
-	MobileNumber         string `json:"mobile_number"`
+	Email                string `json:"email" sql:"unique"`
+	MobileNumber         string `json:"mobile_number" sql:"unique"`
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"password_confirmation"`
 	Device               Device `gorm:"ForeignKey:DeviseToken"`
@@ -35,7 +35,7 @@ type Tracker struct {
 	gorm.Model
 	StartLocation string `json:"start_location"`
 	// StartTime     time.Time `json:"start_time"`
-	Routes []string `json:"route" sql:"type:jsonb"`
+	Routes string `json:"routes"`
 	// Routes map[string]interface{} `json:"route" sql:"type:jsonb`
 	// EndTime       time.Time `json:"end_time"`
 	EndLocation string `json:"end_location"`
