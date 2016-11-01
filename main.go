@@ -28,6 +28,7 @@ func main() {
 	// Routes
 	r := mux.NewRouter()
 	r.HandleFunc("/sign_up", account.Registration.Create).Methods("POST")
+	r.HandleFunc("/sign_in", account.Session.Create).Methods("POST")
 	http.Handle("/", r)
 	log.Printf("main : Started : Listening on: http://localhost:3000")
 	http.ListenAndServe("0.0.0.0:3000", nil)
