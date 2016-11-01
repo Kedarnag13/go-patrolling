@@ -99,55 +99,5 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 		rw.Write(b)
 		goto end
 	}
-
-	// find_user := db.Find(&user, "mobile_number = ? AND devise_token = ?", session.User.MobileNumber, session.DeviseToken)
-
-	// 	if find_user.RecordNotFound() == true {
-	// 		b, err := json.Marshal(models.Message{
-	// 			Success: false,
-	// 			Message: "",
-	// 			Error:   "User does not exist!",
-	// 		})
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-	// 		rw.Header().Set("Content-Type", "application/json")
-	// 		rw.Write(b)
-	// 		goto end
-	// 	} else {
-	// 		var id int
-	// 		err = find_user.Scan(&id)
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-	// 		find_session := db.Find(&session, "user_id = ?", id)
-	// 		if find_session.RecordNotFound() == true {
-	// 			b, err := json.Marshal(models.Message{
-	// 				Success: false,
-	// 				Message: "",
-	// 				Error:   "Session does not exist!",
-	// 			})
-	// 			if err != nil {
-	// 				panic(err)
-	// 			}
-	// 			rw.Header().Set("Content-Type", "application/json")
-	// 			rw.Write(b)
-	// 			goto end
-	// 		} else {
-	// 			session = models.Session{UserID: id, DeviseToken: session.DeviseToken}
-	// 			db.Create(session)
-	// 			b, err := json.Marshal(models.Message{
-	// 				Success: true,
-	// 				Message: "Session created Successfully!",
-	// 				Error:   "",
-	// 			})
-	// 			if err != nil {
-	// 				panic(err)
-	// 			}
-	// 			rw.Header().Set("Content-Type", "application/json")
-	// 			rw.Write(b)
-	// 			goto end
-	// 		}
-	// 	}
 end:
 }
