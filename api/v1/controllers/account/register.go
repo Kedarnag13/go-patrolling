@@ -6,7 +6,6 @@ import (
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
-	// "log"
 	"net/http"
 )
 
@@ -24,7 +23,6 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 	defer db.Close()
 
 	var user models.User
-	// var session models.Session
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -49,6 +47,9 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		db.Create(&user)
 
 		get_user, err := db.Model(&user).Where("mobile_number = ?", user.MobileNumber).Select("id").Rows()
+		if err != nil {
+			panic(err)
+		}
 
 		defer get_user.Close()
 
