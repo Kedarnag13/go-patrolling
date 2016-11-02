@@ -7,7 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"gopkg.in/go-playground/validator.v9"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -41,7 +40,6 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 
 	err = validate.Struct(user)
 
-	log.Println("result != nil :", err != nil)
 	if err != nil {
 		b, err := json.Marshal(models.Message{
 			Success: false,
@@ -53,7 +51,6 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 		}
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
-		// log.Fatal("result:", err_result)
 		goto end
 	} else {
 		find_by_mobile_number := db.Where("mobile_number = ?", user.MobileNumber).Find(&user)
