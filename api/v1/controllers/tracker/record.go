@@ -62,7 +62,7 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 	b, err := json.Marshal(models.Message{
 		Success: true,
 		Message: "Track recorded Successfully!",
-		Error:   "",
+		Error:   err.Error(),
 	})
 	if err != nil {
 		panic(err)

@@ -8,14 +8,14 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName            string `json:"first_name"`
+	FirstName            string `json:"first_name" validate:"required"`
 	LastName             string `json:"last_name"`
-	Email                string `json:"email" sql:"unique"`
-	MobileNumber         string `json:"mobile_number" sql:"unique"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	Email                string `json:"email" sql:"unique" validate:"required,email"`
+	MobileNumber         string `json:"mobile_number" sql:"unique" validate:"required"`
+	Password             string `json:"password" validate:"required"`
+	PasswordConfirmation string `json:"password_confirmation" validate:"required"`
 	Device               Device `gorm:"ForeignKey:DeviseToken"`
-	DeviseToken          string `json:"devise_token"`
+	DeviseToken          string `json:"devise_token" validate:"required"`
 }
 
 type Session struct {
@@ -46,5 +46,5 @@ type Tracker struct {
 type Message struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
-	Error   string `json:"error"`
+	Error   string  `json:"error"`
 }
