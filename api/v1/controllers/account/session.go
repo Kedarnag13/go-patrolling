@@ -36,7 +36,7 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	find_user, err := db.Model(&user).Where("devise_token = ?", session.DeviseToken).Select("id").Rows()
+	find_user, err := db.Model(&user).Where("mobile_number = ?", session.MobileNumber).Select("id").Rows()
 	if err != nil {
 		panic(err)
 	}
