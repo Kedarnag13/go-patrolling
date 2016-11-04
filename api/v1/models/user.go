@@ -34,14 +34,18 @@ type Device struct {
 
 type Tracker struct {
 	gorm.Model
-	StartLocation string `json:"start_location"`
-	// StartTime     time.Time `json:"start_time"`
-	Routes string `json:"routes"`
-	// Routes map[string]interface{} `json:"route" sql:"type:jsonb`
-	// EndTime       time.Time `json:"end_time"`
-	EndLocation string `json:"end_location"`
-	User        User   `gorm:"ForeignKey:UserID"`
-	UserID      int    `json:"user_id"`
+	StartLocation string  `json:"start_location"`
+	Route         []Route `json:"route" sql:"type:jsonb"`
+	EndLocation   string  `json:"end_location"`
+	User          User    `gorm:"ForeignKey:UserID"`
+	UserID        int     `json:"user_id"`
+}
+
+type Route struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Route     Tracker `gorm:"ForeignKey:TrackerID"`
+	RouteID   int     `json:"route_id"`
 }
 
 type Message struct {

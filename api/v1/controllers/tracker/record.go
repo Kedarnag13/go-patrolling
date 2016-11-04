@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
+	// "github.com/lib/pq"
 	"io/ioutil"
 	// "log"
 	"net/http"
@@ -43,30 +44,21 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	track = models.Tracker{StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: id}
+	for _, v := range track.Route {
+		track = models.Tracker{StartLocation: track.StartLocation, Route: []models.Route{Latitude: v.Latitude, Longitude: v.Longitude}, EndLocation: track.EndLocation, UserID: id}
 
-	// var routes models.Tracker
-	// err = json.Unmarshal(body, &routes)
-	// if err != nil {
-	// 	panic(err)
-	// }
+		db.Create(&track)
 
-	// var route string
-	// track.Routes = []string{}
-	// for _, route = range routes.Routes {
-	// 	track.Routes = append(track.Routes, route)
-	// }
-
-	db.Create(&track)
-
-	b, err := json.Marshal(models.Message{
-		Success: true,
-		Message: "Track recorded Successfully!",
-		Error:   "",
-	})
-	if err != nil {
-		panic(err)
+		// log.Println("track", &track)
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "Track recorded Successfully!",
+			Error:   "",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
 	}
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(b)
 }
