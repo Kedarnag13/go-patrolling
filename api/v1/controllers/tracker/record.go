@@ -5,8 +5,9 @@ import (
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"github.com/jinzhu/gorm"
 	// "github.com/lib/pq"
+	"github.com/zabawaba99/firego"
 	"io/ioutil"
-	// "log"
+	"log"
 	"net/http"
 )
 
@@ -44,21 +45,30 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	for _, v := range track.Route {
-		track = models.Tracker{StartLocation: track.StartLocation, Route: []models.Route{Latitude: v.Latitude, Longitude: v.Longitude}, EndLocation: track.EndLocation, UserID: id}
+	fb := firego.New("https://go-patrolling.firebaseio.com/", nil)
+	fb.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
+	fb.Shallow(true)
+	fb.IncludePriority(true)
 
-		db.Create(&track)
+	// for _, v := range track.Route {
+	track = models.Tracker{StartLocation: track.StartLocation, Route: track.Route, EndLocation: track.EndLocation, UserID: id}
 
-		// log.Println("track", &track)
-		b, err := json.Marshal(models.Message{
-			Success: true,
-			Message: "Track recorded Successfully!",
-			Error:   "",
-		})
-		if err != nil {
-			panic(err)
-		}
-		rw.Header().Set("Content-Type", "application/json")
-		rw.Write(b)
+	newRef, err := fb.Push(&track)
+	if err != nil || newRef == nil {
+		log.Fatal(err)
 	}
+
+	// db.Create(&track)
+
+	// // log.Println("track", &track)
+	b, err := json.Marshal(models.Message{
+		Success: true,
+		Message: "Track recorded Successfully!",
+		Error:   "",
+	})
+	if err != nil {
+		panic(err)
+	}
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Write(b)
 }

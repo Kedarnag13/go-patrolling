@@ -21,10 +21,10 @@ func main() {
 	defer db.Close()
 
 	// Setup the Tables
-	db.CreateTable(&models.User{}, &models.Session{}, &models.Device{}, &models.Tracker{}, &models.Route{})
+	db.CreateTable(&models.User{}, &models.Session{}, &models.Device{}, &models.Tracker{})
 
 	// Migrations
-	db.AutoMigrate(&models.User{}, &models.Session{}, &models.Device{}, &models.Tracker{}, &models.Route{})
+	db.AutoMigrate(&models.User{}, &models.Session{}, &models.Device{}, &models.Tracker{})
 
 	// Routes
 	r := mux.NewRouter()
