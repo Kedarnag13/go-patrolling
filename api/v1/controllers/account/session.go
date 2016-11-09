@@ -33,14 +33,19 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 	if err := f.Child("Users").EqualTo(session.Id).OrderBy("mobile_number").Value(&get_user); err != nil {
 		panic(err)
 	}
-	for _, value := range get_user {
+	for key, value := range get_user {
 		mapped_value := value.(map[string]interface{})
 		if mapped_value["id"] == nil {
 			session = models.Session{UserID: mapped_value["id"].(string), DeviseToken: session.DeviseToken}
-			add_session, err := f.Child("Session").Push(session)
-			if err != nil || add_session == nil {
+			child_user := f.Child("Users")
+			if child_user == nil {
 				panic(err)
 			}
+			child_track := child_user.Child(key)
+			if child_track == nil {
+				panic(err)
+			}
+			child_track.Child("Tracker").Push(session)
 			b, err := json.Marshal(models.Message{
 				Success: true,
 				Message: "Session created Successfully!",
