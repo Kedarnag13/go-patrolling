@@ -16,7 +16,7 @@ type User struct {
 }
 
 type Session struct {
-	Id           string
+	Id           string `json:"id"`
 	MobileNumber string `json:"mobile_number"`
 	UserID       string `json:"user_id"`
 	DeviseToken  string `json:"devise_token"`
