@@ -28,13 +28,13 @@ type Device struct {
 }
 
 type Tracker struct {
-	Id            string             `json:"id"`
-	StartLocation string             `json:"start_location"`
-	StartTime     time.Time          `json:"start_time"`
-	Routes        map[string]float64 `json:"routes"`
-	EndTime       time.Time          `json:"end_time"`
-	EndLocation   string             `json:"end_location"`
-	UserID        string             `json:"user_id"`
+	Id            string               `json:"id"`
+	StartLocation string               `json:"start_location"`
+	StartTime     time.Time            `json:"start_time"`
+	Routes        []map[string]float64 `json:"routes"`
+	EndTime       time.Time            `json:"end_time"`
+	EndLocation   string               `json:"end_location"`
+	UserID        string               `json:"user_id"`
 }
 
 type Message struct {
