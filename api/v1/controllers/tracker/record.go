@@ -74,6 +74,7 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		}
 		rw.Header().Set("Content-Type", "application/json")
 		rw.Write(b)
+		goto end
 	}
 
 	// track = models.Tracker{StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: id}
@@ -134,4 +135,5 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 	// }
 	// rw.Header().Set("Content-Type", "application/json")
 	// rw.Write(b)
+end:
 }
