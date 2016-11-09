@@ -17,13 +17,6 @@ var Registration registrationController
 
 func (r registrationController) Create(rw http.ResponseWriter, req *http.Request) {
 
-	// To Connect with the Database
-	// db, err := gorm.Open("postgres", "host=localhost user=postgres password=password dbname=go_patrolling_development sslmode=disable")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer db.Close()
-
 	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
 	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
 

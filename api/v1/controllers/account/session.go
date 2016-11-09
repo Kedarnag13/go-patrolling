@@ -3,7 +3,7 @@ package account
 import (
 	"encoding/json"
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
-	"github.com/jinzhu/gorm"
+	"gopkg.in/zabawaba99/firego.v1"
 	"io/ioutil"
 	"net/http"
 )
@@ -14,16 +14,9 @@ var Session SessionController
 
 func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 
-	flag := 1
+	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
+	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
 
-	// To Connect with the Database
-	db, err := gorm.Open("postgres", "host=localhost user=postgres password=password dbname=go_patrolling_development sslmode=disable")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	var user models.User
 	var session models.Session
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -36,43 +29,18 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	find_user, err := db.Model(&user).Where("mobile_number = ?", session.MobileNumber).Select("id").Rows()
-	if err != nil {
+	var get_user map[string]interface{}
+	if err := f.Child("Users").EqualTo(session.Id).OrderBy("mobile_number").Value(&get_user); err != nil {
 		panic(err)
 	}
-
-	defer find_user.Close()
-
-	for find_user.Next() {
-		flag = 0
-		var id int
-		err = find_user.Scan(&id)
-		find_session := db.Find(&session, "user_id = ?", id)
-		if find_session.RecordNotFound() == true {
-			b, err := json.Marshal(models.Message{
-				Success: false,
-				Message: "",
-				Error:   "Session does not exist!",
-			})
-			if err != nil {
+	for _, value := range get_user {
+		mapped_value := value.(map[string]interface{})
+		if mapped_value["id"] == nil {
+			session = models.Session{UserID: mapped_value["id"].(string), DeviseToken: session.DeviseToken}
+			add_session, err := f.Child("Session").Push(session)
+			if err != nil || add_session == nil {
 				panic(err)
 			}
-			rw.Header().Set("Content-Type", "application/json")
-			rw.Write(b)
-		} else if find_session.RecordNotFound() == false {
-			b, err := json.Marshal(models.Message{
-				Success: false,
-				Message: "Session already exists!",
-				Error:   "",
-			})
-			if err != nil {
-				panic(err)
-			}
-			rw.Header().Set("Content-Type", "application/json")
-			rw.Write(b)
-		} else {
-			session = models.Session{UserID: id, DeviseToken: session.DeviseToken}
-			db.Create(session)
 			b, err := json.Marshal(models.Message{
 				Success: true,
 				Message: "Session created Successfully!",
@@ -83,21 +51,86 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 			}
 			rw.Header().Set("Content-Type", "application/json")
 			rw.Write(b)
+			goto end
+		} else {
+			b, err := json.Marshal(models.Message{
+				Success: false,
+				Message: "Session already exists!",
+				Error:   "",
+			})
+			if err != nil {
+				panic(err)
+			}
+			rw.Header().Set("Content-Type", "application/json")
+			rw.Write(b)
+			goto end
 		}
-		goto end
-	}
-	if flag == 1 {
-		b, err := json.Marshal(models.Message{
-			Success: false,
-			Message: "",
-			Error:   "User does not exist!",
-		})
-		if err != nil {
-			panic(err)
-		}
-		rw.Header().Set("Content-Type", "application/json")
-		rw.Write(b)
-		goto end
 	}
 end:
 }
+
+// 	find_user, err := db.Model(&user).Where("mobile_number = ?", session.MobileNumber).Select("id").Rows()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	defer find_user.Close()
+
+// 	for find_user.Next() {
+// 		flag = 0
+// 		var id int
+// 		err = find_user.Scan(&id)
+// 		find_session := db.Find(&session, "user_id = ?", id)
+// 		if find_session.RecordNotFound() == true {
+// 			b, err := json.Marshal(models.Message{
+// 				Success: false,
+// 				Message: "",
+// 				Error:   "Session does not exist!",
+// 			})
+// 			if err != nil {
+// 				panic(err)
+// 			}
+// 			rw.Header().Set("Content-Type", "application/json")
+// 			rw.Write(b)
+// 		} else if find_session.RecordNotFound() == false {
+// 			b, err := json.Marshal(models.Message{
+// 				Success: false,
+// 				Message: "Session already exists!",
+// 				Error:   "",
+// 			})
+// 			if err != nil {
+// 				panic(err)
+// 			}
+// 			rw.Header().Set("Content-Type", "application/json")
+// 			rw.Write(b)
+// 		} else {
+// 			session = models.Session{UserID: id, DeviseToken: session.DeviseToken}
+// 			db.Create(session)
+// 			b, err := json.Marshal(models.Message{
+// 				Success: true,
+// 				Message: "Session created Successfully!",
+// 				Error:   "",
+// 			})
+// 			if err != nil {
+// 				panic(err)
+// 			}
+// 			rw.Header().Set("Content-Type", "application/json")
+// 			rw.Write(b)
+// 		}
+// 		goto end
+// 	}
+// 	if flag == 1 {
+// 		b, err := json.Marshal(models.Message{
+// 			Success: false,
+// 			Message: "",
+// 			Error:   "User does not exist!",
+// 		})
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 		rw.Header().Set("Content-Type", "application/json")
+// 		rw.Write(b)
+// 		goto end
+// 	}
+// end:
+// }

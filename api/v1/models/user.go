@@ -1,5 +1,9 @@
 package models
 
+import (
+	"time"
+)
+
 type User struct {
 	Id                   string `json:"id"`
 	FirstName            string `json:"first_name"`
@@ -12,9 +16,10 @@ type User struct {
 }
 
 type Session struct {
-	Id          string
-	UserID      string `json:"user_id"`
-	DeviseToken string `json:"devise_token"`
+	Id           string
+	MobileNumber string `json:"mobile_number"`
+	UserID       string `json:"user_id"`
+	DeviseToken  string `json:"devise_token"`
 }
 
 type Device struct {
@@ -26,8 +31,7 @@ type Tracker struct {
 	Id            string             `json:"id"`
 	StartLocation string             `json:"start_location"`
 	StartTime     time.Time          `json:"start_time"`
-	Routes        string             `json:"routes"`
-	Routes        map[string]float64 `json:"route"`
+	Routes        map[string]float64 `json:"routes"`
 	EndTime       time.Time          `json:"end_time"`
 	EndLocation   string             `json:"end_location"`
 	UserID        string             `json:"user_id"`
