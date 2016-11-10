@@ -31,7 +31,7 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 	}
 	user_id, err := generate_user_id.CreateToken(data, options)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	var user models.User
