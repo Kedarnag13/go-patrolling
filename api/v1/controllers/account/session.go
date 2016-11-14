@@ -2,9 +2,11 @@ package account
 
 import (
 	"encoding/json"
+	// "github.com/Kedarnag13/go-patrolling/api/v1/controllers"
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
 	"gopkg.in/zabawaba99/firego.v1"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -14,9 +16,12 @@ var Session SessionController
 
 func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 
+	// flag := 0
+
 	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
 	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
 
+	var user models.User
 	var session models.Session
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -29,37 +34,15 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	var get_user map[string]interface{}
-	if err := f.Child("Users").EqualTo(session.Id).OrderBy("mobile_number").Value(&get_user); err != nil {
+	var get_sessions map[string]interface{}
+	if err := f.Child("Sessions").EqualTo(user.MobileNumber).OrderBy("mobile_number").Value(&get_sessions); err != nil {
 		panic(err)
 	}
-	for key, value := range get_user {
-		mapped_value := value.(map[string]interface{})
-		if mapped_value["id"] == nil {
-			session = models.Session{UserID: mapped_value["id"].(string), DeviseToken: session.DeviseToken}
-			child_user := f.Child("Users")
-			if child_user == nil {
-				panic(err)
-			}
-			child_track := child_user.Child(key)
-			if child_track == nil {
-				panic(err)
-			}
-			child_track.Child("Tracker").Push(session)
+	for _, value := range get_sessions {
+		get_session := value.(map[string]interface{})
+		if get_session["devise_token"] == session.DeviseToken {
 			b, err := json.Marshal(models.Message{
 				Success: true,
-				Message: "Session created Successfully!",
-				Error:   "",
-			})
-			if err != nil {
-				panic(err)
-			}
-			rw.Header().Set("Content-Type", "application/json")
-			rw.Write(b)
-			goto end
-		} else {
-			b, err := json.Marshal(models.Message{
-				Success: false,
 				Message: "Session already exists!",
 				Error:   "",
 			})
@@ -69,7 +52,17 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Set("Content-Type", "application/json")
 			rw.Write(b)
 			goto end
+		} else {
+			var get_user map[string]interface{}
+			if err := f.Child("Users").EqualTo(user.MobileNumber).OrderBy("mobile_number").Value(&get_user); err != nil {
+				panic(err)
+			}
+			log.Println(get_user)
 		}
 	}
 end:
+}
+
+func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
+
 }
