@@ -20,7 +20,6 @@ type Session struct {
 	MobileNumber string `json:"mobile_number"`
 	UserID       string `json:"user_id"`
 	DeviseToken  string `json:"devise_token"`
-	User         User
 }
 
 type Device struct {
