@@ -118,6 +118,8 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 				Message: "Session created Successfully!",
 				Error:   "",
 				User:    user,
+				Session: session,
+				Device:  device,
 			})
 			if err != nil {
 				panic(err)

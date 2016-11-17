@@ -40,8 +40,10 @@ type Tracker struct {
 }
 
 type Message struct {
-	User    User   `json:"user"`
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Error   string `json:"error"`
+	User    User    `json:"user"`
+	Session Session `json:"session"`
+	Device  Device  `json:device`
+	Success bool    `json:"success"`
+	Message string  `json:"message"`
+	Error   string  `json:"error"`
 }
