@@ -108,7 +108,7 @@ func (r registrationController) Create(rw http.ResponseWriter, req *http.Request
 			if err != nil || child_session == nil {
 				panic(err)
 			}
-			device = models.Device{Id: device_id, Token: user_id}
+			device = models.Device{Id: device_id, Token: user_id, SessionID: session_id}
 			child_device, err := f.Child("Devices").Push(device)
 			if err != nil || child_device == nil {
 				panic(err)
