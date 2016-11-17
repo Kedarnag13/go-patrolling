@@ -18,13 +18,15 @@ type User struct {
 type Session struct {
 	Id           string `json:"id"`
 	MobileNumber string `json:"mobile_number"`
+	Password     string `json:"password"`
 	UserID       string `json:"user_id"`
 	DeviseToken  string `json:"devise_token"`
 }
 
 type Device struct {
-	Id    string
-	Token string `json:"token"`
+	Id        string
+	Token     string `json:"token"`
+	SessionID string `json:"session_id"`
 }
 
 type Tracker struct {

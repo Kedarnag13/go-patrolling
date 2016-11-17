@@ -14,7 +14,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/sign_up", account.Registration.Create).Methods("POST")
 	r.HandleFunc("/sign_in", account.Session.Create).Methods("POST")
-	r.HandleFunc("/sign_out", account.Session.Destroy).Methods("GET")
+	r.HandleFunc("/sign_out/{mobile_number:([0-9]+)?}", account.Session.Destroy).Methods("GET")
 	r.HandleFunc("/record", tracker.Track.Route).Methods("POST")
 	http.Handle("/", r)
 	log.Printf("main : Started : Listening on: http://localhost:3000")
