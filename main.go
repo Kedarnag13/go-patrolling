@@ -17,6 +17,7 @@ func main() {
 	r.HandleFunc("/sign_in", account.Session.Create).Methods("POST")
 	r.HandleFunc("/sign_out/{mobile_number:([0-9]+)?}", account.Session.Destroy).Methods("GET")
 	r.HandleFunc("/record", tracker.Track.Route).Methods("POST")
+	r.HandleFunc("/get_routes_for/{mobile_number:([0-9]+)?}", tracker.Track.Get_Routes_For).Methods("GET")
 	handler := cors.Default().Handler(r)
 	http.Handle("/", handler)
 	log.Printf("main : Started : Listening on: http://localhost:3000")
