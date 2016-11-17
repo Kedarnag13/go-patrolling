@@ -97,6 +97,7 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 					Success: true,
 					Message: "Session created Successfully!",
 					Error:   "",
+					Session: session,
 				})
 				if err != nil {
 					panic(err)
@@ -165,8 +166,8 @@ func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 		f.Child("Sessions").Child(key).Remove()
 		b, err := json.Marshal(models.Message{
 			Success: true,
-			Message: "",
-			Error:   "Logged out Successfully!",
+			Message: "Logged out Successfully!",
+			Error:   "",
 		})
 		if err != nil {
 			panic(err)
@@ -175,7 +176,7 @@ func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 		rw.Write(b)
 	}
 	b, err := json.Marshal(models.Message{
-		Success: true,
+		Success: false,
 		Message: "",
 		Error:   "You are not logged in!",
 	})
