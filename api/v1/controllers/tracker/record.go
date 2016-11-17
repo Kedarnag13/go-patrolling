@@ -6,6 +6,7 @@ import (
 	"github.com/zabawaba99/fireauth"
 	"gopkg.in/zabawaba99/firego.v1"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -45,9 +46,11 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	var get_session map[string]interface{}
-	if err = f.Child("Sessions").EqualTo(track.UserID).OrderBy("mobile_number").Value(&get_session); err != nil {
+	if err = f.Child("Sessions").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_session); err != nil {
 		panic(err)
 	}
+
+	log.Println(get_session)
 
 	if len(get_session) == 0 {
 		b, err := json.Marshal(models.Message{
@@ -62,7 +65,7 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		rw.Write(b)
 		goto end
 	} else {
-		track = models.Tracker{Id: track_id, StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: track.UserID}
+		track = models.Tracker{Id: track_id, StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, MobileNumber: track.MobileNumber}
 		child_track, err := f.Child("Tracker").Push(track)
 		if err != nil || child_track == nil {
 			panic(err)

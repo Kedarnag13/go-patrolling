@@ -36,7 +36,7 @@ type Tracker struct {
 	Routes        []map[string]float64 `json:"routes"`
 	EndTime       time.Time            `json:"end_time"`
 	EndLocation   string               `json:"end_location"`
-	UserID        string               `json:"user_id"`
+	MobileNumber  string               `json:"mobile_number"`
 }
 
 type Message struct {
