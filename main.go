@@ -4,6 +4,7 @@ import (
 	"github.com/Kedarnag13/go-patrolling/api/v1/controllers/account"
 	"github.com/Kedarnag13/go-patrolling/api/v1/controllers/tracker"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 )
@@ -16,7 +17,8 @@ func main() {
 	r.HandleFunc("/sign_in", account.Session.Create).Methods("POST")
 	r.HandleFunc("/sign_out/{mobile_number:([0-9]+)?}", account.Session.Destroy).Methods("GET")
 	r.HandleFunc("/record", tracker.Track.Route).Methods("POST")
-	http.Handle("/", r)
+	handler := cors.Default().Handler(r)
+	http.Handle("/", handler)
 	log.Printf("main : Started : Listening on: http://localhost:3000")
 	http.ListenAndServe("0.0.0.0:3000", nil)
 }
