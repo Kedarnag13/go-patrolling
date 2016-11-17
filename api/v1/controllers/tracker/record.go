@@ -6,7 +6,6 @@ import (
 	"github.com/zabawaba99/fireauth"
 	"gopkg.in/zabawaba99/firego.v1"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -33,7 +32,6 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	var session models.Session
 	var track models.Tracker
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -46,24 +44,29 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	log.Printf("%v", track)
-
-	var get_user map[string]interface{}
-	if err := f.Child("Users").EqualTo(session.Id).OrderBy("mobile_number").Value(&get_user); err != nil {
+	var get_session map[string]interface{}
+	if err = f.Child("Sessions").EqualTo(track.UserID).OrderBy("mobile_number").Value(&get_session); err != nil {
 		panic(err)
 	}
-	for key, value := range get_user {
-		mapped_value := value.(map[string]interface{})
-		track = models.Tracker{Id: track_id, StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: mapped_value["id"].(string)}
-		child_user := f.Child("Users")
-		if child_user == nil {
+
+	if len(get_session) == 0 {
+		b, err := json.Marshal(models.Message{
+			Success: false,
+			Message: "",
+			Error:   "You need to be logged in!",
+		})
+		if err != nil {
 			panic(err)
 		}
-		child_track := child_user.Child(key)
-		if child_track == nil {
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	} else {
+		track = models.Tracker{Id: track_id, StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: track.UserID}
+		child_track, err := f.Child("Tracker").Push(track)
+		if err != nil || child_track == nil {
 			panic(err)
 		}
-		child_track.Child("Tracker").Push(track)
 		b, err := json.Marshal(models.Message{
 			Success: true,
 			Message: "Track recorded Successfully!",
