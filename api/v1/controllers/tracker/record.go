@@ -93,19 +93,40 @@ func (r RecordController) Get_Routes_For(rw http.ResponseWriter, req *http.Reque
 	vars := mux.Vars(req)
 	mobile_number := `"` + vars["mobile_number"] + `"`
 
-	var get_all_track map[string]interface{}
-	if err := f.Child("Trackers").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_all_track); err != nil {
+	var get_entire_session map[string]interface{}
+	if err := f.Child("Sessions").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_entire_session); err != nil {
 		panic(err)
 	}
-	b, err := json.Marshal(models.Message{
-		Success: true,
-		Message: "All Tracks for MobileNumber",
-		Error:   "",
-		Tracker: get_all_track,
-	})
-	if err != nil {
-		panic(err)
+
+	if len(get_entire_session) == 0 {
+		b, err := json.Marshal(models.Message{
+			Success: false,
+			Message: "",
+			Error:   "You need to be logged in!",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	} else {
+		var get_all_track map[string]interface{}
+		if err := f.Child("Trackers").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_all_track); err != nil {
+			panic(err)
+		}
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "All Tracks for MobileNumber",
+			Error:   "",
+			Tracker: get_all_track,
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
 	}
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(b)
+end:
 }
