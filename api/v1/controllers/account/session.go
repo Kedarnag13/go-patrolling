@@ -93,10 +93,12 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 				if err != nil || child_device == nil {
 					panic(err)
 				}
+				user_details := models.User{FirstName: user["first_name"].(string), LastName: user["last_name"].(string), Email: user["email"].(string), MobileNumber: user["mobile_number"].(string)}
 				b, err := json.Marshal(models.Message{
 					Success: true,
 					Message: "Session created Successfully!",
 					Error:   "",
+					User:    user_details,
 					Session: session,
 				})
 				if err != nil {
