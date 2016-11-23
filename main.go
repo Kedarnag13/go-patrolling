@@ -20,6 +20,6 @@ func main() {
 	r.HandleFunc("/get_routes_for/{mobile_number:([0-9]+)?}", tracker.Track.Get_Routes_For).Methods("GET")
 	handler := cors.Default().Handler(r)
 	http.Handle("/", handler)
-	log.Printf("main : Started : Listening on: http://localhost:3000")
-	http.ListenAndServe("0.0.0.0:3000", nil)
+	log.Printf("main : Started : Listening on: http://localhost:3010")
+	http.ListenAndServe("0.0.0.0:3010", nil)
 }
