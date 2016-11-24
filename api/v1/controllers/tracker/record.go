@@ -3,9 +3,10 @@ package tracker
 import (
 	"encoding/json"
 	"github.com/Kedarnag13/go-patrolling/api/v1/models"
-	"github.com/jinzhu/gorm"
+	"github.com/gorilla/mux"
+	"github.com/zabawaba99/fireauth"
+	"gopkg.in/zabawaba99/firego.v1"
 	"io/ioutil"
-	// "log"
 	"net/http"
 )
 
@@ -15,15 +16,24 @@ var Track RecordController
 
 func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 
-	// To Connect with the Database
-	db, err := gorm.Open("postgres", "host=localhost user=postgres password=password dbname=go_patrolling_development sslmode=disable")
+	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
+	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
+
+	generate_track_id := fireauth.New("go-patrolling")
+
+	data := fireauth.Data{"uid": "1"}
+	options := &fireauth.Option{
+		NotBefore:  2,
+		Expiration: 3,
+		Admin:      false,
+		Debug:      true,
+	}
+	track_id, err := generate_track_id.CreateToken(data, options)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	var track models.Tracker
-	var session models.Session
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -35,38 +45,88 @@ func (r RecordController) Route(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	get_user := db.Model(&session).Where("user_id = ?", track.UserID).Select("id").Row()
+	mobile_number := `"` + track.MobileNumber + `"`
 
-	var id int
-	err = get_user.Scan(&id)
-	if err != nil {
+	var get_session map[string]interface{}
+	if err = f.Child("Sessions").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_session); err != nil {
 		panic(err)
 	}
 
-	track = models.Tracker{StartLocation: track.StartLocation, Routes: track.Routes, EndLocation: track.EndLocation, UserID: id}
+	if len(get_session) == 0 {
+		b, err := json.Marshal(models.Message{
+			Success: false,
+			Message: "",
+			Error:   "You need to be logged in!",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	} else {
+		track = models.Tracker{Id: track_id, StartLocation: track.StartLocation, StartTime: track.StartTime, Routes: track.Routes, EndTime: track.EndTime, EndLocation: track.EndLocation, MobileNumber: track.MobileNumber, CreatedAt: track.CreatedAt}
+		child_track, err := f.Child("Trackers").Push(track)
+		if err != nil || child_track == nil {
+			panic(err)
+		}
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "Track recorded Successfully!",
+			Error:   "",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	}
+end:
+}
 
-	// var routes models.Tracker
-	// err = json.Unmarshal(body, &routes)
-	// if err != nil {
-	// 	panic(err)
-	// }
+func (r RecordController) Get_Routes_For(rw http.ResponseWriter, req *http.Request) {
 
-	// var route string
-	// track.Routes = []string{}
-	// for _, route = range routes.Routes {
-	// 	track.Routes = append(track.Routes, route)
-	// }
+	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
+	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
 
-	db.Create(&track)
+	vars := mux.Vars(req)
+	mobile_number := `"` + vars["mobile_number"] + `"`
 
-	b, err := json.Marshal(models.Message{
-		Success: true,
-		Message: "Track recorded Successfully!",
-		Error:   "",
-	})
-	if err != nil {
+	var get_entire_session map[string]interface{}
+	if err := f.Child("Sessions").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_entire_session); err != nil {
 		panic(err)
 	}
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(b)
+
+	if len(get_entire_session) == 0 {
+		b, err := json.Marshal(models.Message{
+			Success: false,
+			Message: "",
+			Error:   "You need to be logged in!",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	} else {
+		var get_all_track map[string]interface{}
+		if err := f.Child("Trackers").EqualTo(mobile_number).OrderBy("mobile_number").Value(&get_all_track); err != nil {
+			panic(err)
+		}
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "All Tracks for MobileNumber",
+			Error:   "",
+			Tracker: get_all_track,
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
+		goto end
+	}
+end:
 }
