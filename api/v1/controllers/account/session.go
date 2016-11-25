@@ -153,7 +153,7 @@ end:
 
 func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 
-	flag := 0
+	flag := 1
 
 	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
 	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
