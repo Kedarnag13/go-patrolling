@@ -165,26 +165,32 @@ func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 	}
 	for s_key := range get_entire_session {
 		key := s_key
-		f.Child("Sessions").Child(key).Remove()
-		b, err := json.Marshal(models.Message{
-			Success: true,
-			Message: "Logged out Successfully!",
-			Error:   "",
-		})
-		if err != nil {
-			panic(err)
+		err := f.Child("Sessions").Child(key).Remove()
+		if err == nil {
+			b, err := json.Marshal(models.Message{
+				Success: true,
+				Message: "Logged out Successfully!",
+				Error:   "",
+			})
+			if err != nil {
+				panic(err)
+			}
+			rw.Header().Set("Content-Type", "application/json")
+			rw.Write(b)
+			goto end
+		} else {
+			b, err := json.Marshal(models.Message{
+				Success: false,
+				Message: "",
+				Error:   "You are not logged in!",
+			})
+			if err != nil {
+				panic(err)
+			}
+			rw.Header().Set("Content-Type", "application/json")
+			rw.Write(b)
+			goto end
 		}
-		rw.Header().Set("Content-Type", "application/json")
-		rw.Write(b)
 	}
-	b, err := json.Marshal(models.Message{
-		Success: false,
-		Message: "",
-		Error:   "You are not logged in!",
-	})
-	if err != nil {
-		panic(err)
-	}
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(b)
+end:
 }
