@@ -123,7 +123,7 @@ func (s SessionController) Create(rw http.ResponseWriter, req *http.Request) {
 			}
 		} else {
 			b, err := json.Marshal(models.Message{
-				Success: false,
+				Success: true,
 				Message: "",
 				Error:   "Session already exists!",
 			})
