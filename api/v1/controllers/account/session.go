@@ -153,6 +153,8 @@ end:
 
 func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 
+	flag := 0
+
 	f := firego.New("https://go-patrolling.firebaseio.com/", nil)
 	f.Auth("P0xReX74eqJ6dgZhaujvdamVtzp0o7ik20nLuIGO")
 
@@ -177,20 +179,21 @@ func (s SessionController) Destroy(rw http.ResponseWriter, req *http.Request) {
 			}
 			rw.Header().Set("Content-Type", "application/json")
 			rw.Write(b)
-			goto end
-		} else {
-			b, err := json.Marshal(models.Message{
-				Success: false,
-				Message: "",
-				Error:   "You are not logged in!",
-			})
-			if err != nil {
-				panic(err)
-			}
-			rw.Header().Set("Content-Type", "application/json")
-			rw.Write(b)
+			flag = 0
 			goto end
 		}
+	}
+	if flag == 1 {
+		b, err := json.Marshal(models.Message{
+			Success: true,
+			Message: "Your session has been destoyed.",
+			Error:   "",
+		})
+		if err != nil {
+			panic(err)
+		}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(b)
 	}
 end:
 }
